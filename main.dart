@@ -1,61 +1,79 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(TabBarDemo());
+  runApp(new MaterialApp(
+      title: 'Calculador de Propina',
+      home: new TipCalculator()
+  ));
 }
 
-class TabBarDemo extends StatelessWidget {
+class TipCalculator extends StatelessWidget {
+  double billAmount = 0.0;
+  double tipPercentage = 0.0;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.deepPurple,
-        accentColor: Colors.red,
-      ),
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.directions_car)),
-                Tab(icon: Icon(Icons.directions_transit)),
-                Tab(icon: Icon(Icons.directions_bike)),
-              ],
-            ),
-            title: Text('Tabs Demo'),
-          ),
-          body: TabBarView(
-            children: [
-              new Container(
-                margin: const EdgeInsets.all(10.0),
-                child: GridView.count(
-                  crossAxisCount: 1,
-                  children: List.generate(30, (index) {
-                    return Center(
-                      child: Text(
-                        'Item $index',
-                        style: Theme.of(context).textTheme.title,
-                      ),
-                    );
-                  }),
-                ),
-              ),
-              new Row(
-                children: <Widget>[
-                  const FlutterLogo(),
-                  const Expanded(
-                    child: const Text('Flutter\'s hot reload helps you quickly and easily experiment, build UIs, add features, and fix bug faster. Experience sub-second reload times, without losing state, on emulators, simulators, and hardware for iOS and Android.'),
-                  ),
-                  const Icon(Icons.sentiment_very_satisfied),
-                ],
-              ),
-              Icon(Icons.directions_bike),
-            ],
-          ),
+    AppBar appBar = new AppBar(title: new Text("Calculador de Propina"));
+    TextField billAmountField = new TextField(
+        decoration: InputDecoration(
+            labelText: "Monto (\$)",
+            hintText: '0'
         ),
-      ),
+        keyboardType: TextInputType.number,
+        onChanged: (text) {
+          try {
+            billAmount = double.parse(text);
+          } catch (exception) {
+            billAmount = 0.0;
+          }
+        }
     );
+
+// Create another input field
+    TextField tipPercentageField = new TextField(
+        decoration: InputDecoration(
+            labelText: "%",
+          hintText: "10",
+        ),
+        keyboardType: TextInputType.number,
+        onChanged: (text) {
+          try {
+            tipPercentage = double.parse(text);
+          } catch (exception) {
+            tipPercentage = 0.0;
+          }
+        }
+    );
+    // Create button
+    RaisedButton calculateButton = new RaisedButton(
+        child: new Text("Calcular"),
+        color: Theme.of(context).accentColor,
+        splashColor: Colors.blueGrey,
+        padding:const EdgeInsets.all(20.0),
+        onPressed: () {
+          // Calculate tip and total
+          double calculatedTip = billAmount * tipPercentage / 100.0;
+          double total = billAmount + calculatedTip;
+
+// Generate dialog
+          AlertDialog dialog = new AlertDialog(
+              content: new Text("Tip: \$$calculatedTip \n"
+                  "Total: \$$total")
+          );
+
+// Show dialog
+          showDialog(context: context, child: dialog);
+        }
+    );
+    Container container = new Container(
+        padding: const EdgeInsets.all(15.0),
+        child: new Column(
+            children: [ billAmountField,
+            tipPercentageField,
+            calculateButton ]
+        )
+    );
+    Scaffold scaffold = new Scaffold(appBar: appBar,
+        body: container);
+    return scaffold;
   }
 }
